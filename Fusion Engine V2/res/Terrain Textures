@@ -1,0 +1,13 @@
+Terrain Texture Management.
+
+Terrain textures will be managed through a file with numerical values.
+So if we assign grass and it's normal to one, and assign stone and it's normal to two,
+then we can paint a path in the terrain data file by mixing the two numbers between pixels.
+Example:
+1, 1, 2
+1, 2, 1
+2, 1, 1
+
+In the example above, you can see we have a stone path that starts in the bottom left, and 
+moves to the top right. However, this path has sharp edges and no fade. 
+

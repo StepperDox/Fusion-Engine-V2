@@ -1,0 +1,42 @@
+#version 400 core
+
+in vec3 pos;
+in vec2 tex;
+in vec3 norm;
+
+out vec2 nTex;
+out vec3 sNorm;
+out vec3 toLight[128];
+out vec3 toCam;
+out float vis;
+
+uniform int lCount;
+uniform float rows;
+uniform vec2 offset;
+uniform mat4 tMat;
+uniform mat4 pMat;
+uniform mat4 vMat; 
+uniform vec3 lightP[128];
+uniform float fakelight;
+
+const float dens = 0.0035;
+const float grad = 5.0;
+
+void main(void){
+	vec4 wPos = tMat * vec4(pos, 1.0);
+	vec4 pRTC = vMat * wPos;
+	gl_Position = pMat * pRTC;
+	nTex = (tex / rows) + offset;
+	vec3 aNorm = norm;
+	if(fakelight > 0.5){
+		aNorm = vec3(0.0, 1.0, 0.0);
+	}
+	sNorm = (tMat * vec4(aNorm, 0.0)).xyz;
+	for(int i = 0; i < lCount; i++){
+		toLight[i] = lightP[i] - wPos.xyz;
+	}
+	toCam = (inverse(vMat) * vec4(0.0, 0.0, 0.0, 1.0)).xyz - wPos.xyz;
+	float d = length(pRTC.xyz);
+	vis = exp(-pow((d * dens), grad));
+	vis = clamp(vis, 0.0, 1.0);
+}

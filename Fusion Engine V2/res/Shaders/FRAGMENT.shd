@@ -1,0 +1,42 @@
+#version 400 core
+
+in vec2 nTex;
+in vec3 sNorm;
+in vec3 toLight[128];
+in vec3 toCam;
+in float vis;
+
+out vec4 result;
+
+uniform int lCount;
+uniform sampler2D tSample;
+uniform vec3 lightC[128];
+uniform float diffuse;
+uniform float reflection;
+uniform vec3 sky;
+
+void main(void){
+	vec3 uNorm = normalize(sNorm);
+	vec3 uVTC = normalize(toCam);
+	vec3 tDiffuse = vec3(0.0);
+	vec3 tReflect = vec3(0.0);
+	for(int i = 0; i < lCount; i++){
+		vec3 uLV = normalize(toLight[i]);
+		float Dot = dot(uNorm, uLV);
+		float brt = max(Dot, 0.0);
+		vec3 lDir = -uLV;
+		vec3 rlDir = reflect(lDir, uNorm);
+		float spec = dot(rlDir, uVTC);
+		spec = max(spec, 0.0);
+		float damp = pow(spec, diffuse);
+		tDiffuse = tDiffuse + brt * lightC[i];
+		tReflect = tReflect + damp * reflection * lightC[i];
+	}
+	tDiffuse = max(tDiffuse, 0.2);
+	vec4 tCol = texture(tSample, nTex);
+	if(tCol.a < 0.5){
+		discard;
+	}
+	result = vec4(tDiffuse, 1.0) * tCol + vec4(tReflect, 1.0);
+	result = mix(vec4(sky, 1.0), result, vis);
+}

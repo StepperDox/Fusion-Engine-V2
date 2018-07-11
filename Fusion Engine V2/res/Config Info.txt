@@ -1,0 +1,6 @@
+Fusion Engine Console Command Format:
+
+clear						| Clears the Screen
+stop:exit:close					| Exits the Application
+cfg <repair:edit> <identifier> <newVar>		| Edits or Repairs the Main Config File
+fCam <true:false>				| Changes Freecam Mode
